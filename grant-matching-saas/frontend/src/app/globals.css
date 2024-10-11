@@ -3,14 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --primary-color: #003366; /* Navy Blue */
+  --secondary-color: #1E90FF; /* Light Blue */
+  --background: #ffffff; /* White */
   --foreground: #171717;
+  --silver: #C0C0C0; /* Silver */
+  --success: #32CD32; /* Green */
+  --error: #FF4500; /* Red */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #333333;
   }
 }
 
@@ -23,5 +28,35 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  .bg-primary {
+    background-color: var(--primary-color);
+  }
+  .bg-secondary {
+    background-color: var(--secondary-color);
+  }
+  .bg-success {
+    background-color: var(--success);
+  }
+  .bg-error {
+    background-color: var(--error);
+  }
+  .text-primary {
+    color: var(--primary-color);
+  }
+  .text-secondary {
+    color: var(--secondary-color);
+  }
+  .text-success {
+    color: var(--success);
+  }
+  .text-error {
+    color: var(--error);
+  }
+  .border-silver {
+    border-color: var(--silver);
+  }
+  .text-silver {
+    color: var(--silver);
   }
 }
