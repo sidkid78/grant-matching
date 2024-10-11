@@ -4,12 +4,10 @@ interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
   className?: string;
 }
 
-const CardTitle: FC<CardTitleProps> = ({ children, className = '', ...props }) => {
+export const CardTitle: FC<CardTitleProps> = ({ children, className = '', ...props }) => {
   return (
     <h3 className={`text-lg leading-6 font-medium text-gray-900 ${className}`} {...props}>
       {children}
     </h3>
   );
 };
-
-export default CardTitle;

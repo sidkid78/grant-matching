@@ -1,22 +1,25 @@
 'use client'
 
-import React from 'react'
+import { FC, PropsWithChildren } from 'react'
+import { CardHeader } from './ui/cardHeader'
+import { CardTitle } from './ui/cardTitle'
 
 interface CardProps {
-  children: React.ReactNode
   title?: string
   className?: string
 }
 
-export default function Card({ children, title, className = '' }: CardProps) {
+const Card: FC<PropsWithChildren<CardProps>> = ({ children, title, className = '' }) => {
   return (
     <div className={`bg-white shadow overflow-hidden sm:rounded-lg ${className}`}>
       {title && (
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">{title}</h3>
-        </div>
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
       )}
       <div className="px-4 py-5 sm:p-6">{children}</div>
     </div>
   )
 }
+
+export { Card }

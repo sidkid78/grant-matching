@@ -2,150 +2,144 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_restful import Api, Resource
-from dotenv import load_dotenv
-from sqlalchemy import or_, func
+from sqlalchemy import or_, and_, func
 import os
-from urllib.parse import quote_plus
+import uuid
+import pyodbc
+from celery import Celery
 
-load_dotenv()
+app = Flask(__name__)
+CORS(app)
 
-db = SQLAlchemy()
-migrate = Migrate()
-jwt = JWTManager()
+# Azure SQL Server configuration
+server = 'skgrantserverdev.database.windows.net'
+database = 'skGrant_DB'
+username = 'Shaun.Koehn'
+password = 'Silverbus!730'
+driver = '{ODBC Driver 18 for SQL Server}'
 
-def create_app():
-    app = Flask(__name__)
-    CORS(app)
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mssql+pyodbc://{username}:{password}@{server}/{database}?driver={driver}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = 'secret-key'  # Change this!
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 
-    # Configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"mssql+pyodbc:///?odbc_connect={quote_plus(os.getenv('DB_CONNECTION_STRING'))}"
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+jwt = JWTManager(app)
 
-    db.init_app(app)
-    migrate.init_app(app, db)
-    jwt.init_app(app)
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
 
-    api = Api(app)
+# Models
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    company_name = db.Column(db.String(120), nullable=True)
+    uei_code = db.Column(db.String(20), nullable=True)
+    naics_code = db.Column(db.String(10), nullable=True)
+    employee_count = db.Column(db.Integer, nullable=True)
 
-    # Import models
-    from models import User, Grant, UserGrant, GrantRequirement
+class Grant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    agency = db.Column(db.String(100), nullable=False)
+    due_date = db.Column(db.Date, nullable=False)
+    funding_amount = db.Column(db.String(100), nullable=False)
 
-    # Resources
-    class UserRegister(Resource):
-        def post(self):
-            data = request.json
-            if User.query.filter_by(email=data['email']).first():
-                return {"message": "Email already registered"}, 400
-            
-            new_user = User(
-                email=data['email'],
-                password=generate_password_hash(data['password']),
-                company_name=data.get('company_name'),
-                uei_code=data.get('uei_code'),
-                naics_code=data.get('naics_code'),
-                employee_count=data.get('employee_count')
-            )
-            db.session.add(new_user)
-            db.session.commit()
-            return {"message": "User registered successfully"}, 201
+class UserGrant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    grant_id = db.Column(db.Integer, db.ForeignKey('grant.id'), nullable=False)
+    match_score = db.Column(db.Float, nullable=False)
 
-    class UserLogin(Resource):
-        def post(self):
-            data = request.json
-            user = User.query.filter_by(email=data['email']).first()
-            if user and check_password_hash(user.password, data['password']):
-                access_token = create_access_token(identity=user.id)
-                return {"access_token": access_token}, 200
-            return {"message": "Invalid credentials"}, 401
+class GrantRequirement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    grant_id = db.Column(db.Integer, db.ForeignKey('grant.id'), nullable=False)
+    naics_code = db.Column(db.String(10), nullable=True)
+    min_employees = db.Column(db.Integer, nullable=True)
+    max_employees = db.Column(db.Integer, nullable=True)
 
-    class UserProfile(Resource):
-        @jwt_required()
-        def get(self):
-            current_user_id = get_jwt_identity()
-            user = User.query.get(current_user_id)
-            return {
-                'email': user.email,
-                'company_name': user.company_name,
-                'uei_code': user.uei_code,
-                'naics_code': user.naics_code,
-                'employee_count': user.employee_count
-            }
+# Routes
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.json
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({"msg": "Email already registered"}), 400
+    
+    new_user = User(
+        email=data['email'],
+        password=generate_password_hash(data['password']),
+        company_name=data.get('company_name'),
+        uei_code=data.get('uei_code'),
+        naics_code=data.get('naics_code'),
+        employee_count=data.get('employee_count')
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"msg": "User registered successfully"}), 201
 
-        @jwt_required()
-        def put(self):
-            current_user_id = get_jwt_identity()
-            user = User.query.get(current_user_id)
-            data = request.json
-            user.company_name = data.get('company_name', user.company_name)
-            user.uei_code = data.get('uei_code', user.uei_code)
-            user.naics_code = data.get('naics_code', user.naics_code)
-            user.employee_count = data.get('employee_count', user.employee_count)
-            db.session.commit()
-            return {"message": "Profile updated successfully"}, 200
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.json
+    user = User.query.filter_by(email=data['email']).first()
+    if user and check_password_hash(user.password, data['password']):
+        access_token = create_access_token(identity=user.id)
+        return jsonify(access_token=access_token), 200
+    return jsonify({"msg": "Bad username or password"}), 401
 
-    class GrantList(Resource):
-        @jwt_required()
-        def get(self):
-            grants = Grant.query.all()
-            return [{
-                'id': grant.id,
-                'title': grant.title,
-                'agency': grant.agency,
-                'due_date': grant.due_date.isoformat(),
-                'funding_amount': grant.funding_amount
-            } for grant in grants]
+@app.route('/api/profile', methods=['GET', 'PUT'])
+@jwt_required()
+def user_profile():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if request.method == 'GET':
+        return jsonify({
+            'email': user.email,
+            'company_name': user.company_name,
+            'uei_code': user.uei_code,
+            'naics_code': user.naics_code,
+            'employee_count': user.employee_count
+        })
+    elif request.method == 'PUT':
+        data = request.json
+        user.company_name = data.get('company_name', user.company_name)
+        user.uei_code = data.get('uei_code', user.uei_code)
+        user.naics_code = data.get('naics_code', user.naics_code)
+        user.employee_count = data.get('employee_count', user.employee_count)
+        db.session.commit()
+        return jsonify({"msg": "Profile updated successfully"}), 200
 
-    class GrantDetail(Resource):
-        @jwt_required()
-        def get(self, grant_id):
-            grant = Grant.query.get(grant_id)
-            if grant:
-                return {
-                    'id': grant.id,
-                    'title': grant.title,
-                    'agency': grant.agency,
-                    'due_date': grant.due_date.isoformat(),
-                    'funding_amount': grant.funding_amount
-                }
-            return {"message": "Grant not found"}, 404
+@app.route('/api/grants', methods=['GET'])
+@jwt_required()
+def get_grants():
+    grants = Grant.query.all()
+    return jsonify([{
+        'id': grant.id,
+        'title': grant.title,
+        'agency': grant.agency,
+        'due_date': grant.due_date.isoformat(),
+        'funding_amount': grant.funding_amount
+    } for grant in grants])
 
-    class GrantMatches(Resource):
-        @jwt_required()
-        def get(self):
-            current_user_id = get_jwt_identity()
-            user = User.query.get(current_user_id)
-            
-            grants = Grant.query.all()
-            matched_grants = []
-            
-            for grant in grants:
-                match_score = calculate_match_score(user, grant)
-                if match_score > 0:
-                    matched_grants.append({
-                        'id': grant.id,
-                        'title': grant.title,
-                        'agency': grant.agency,
-                        'due_date': grant.due_date.isoformat(),
-                        'funding_amount': grant.funding_amount,
-                        'match_score': match_score
-                    })
-            
-            matched_grants.sort(key=lambda x: x['match_score'], reverse=True)
-            return matched_grants
-
-    # Add resources to API
-    api.add_resource(UserRegister, '/api/register')
-    api.add_resource(UserLogin, '/api/login')
-    api.add_resource(UserProfile, '/api/profile')
-    api.add_resource(GrantList, '/api/grants')
-    api.add_resource(GrantDetail, '/api/grants/<int:grant_id>')
-    api.add_resource(GrantMatches, '/api/grants/matches')
-
-    return app
+@app.route('/api/grants/<int:grant_id>', methods=['GET'])
+@jwt_required()
+def get_grant(grant_id):
+    grant = Grant.query.get(grant_id)
+    if grant:
+        return jsonify({
+            'id': grant.id,
+            'title': grant.title,
+            'agency': grant.agency,
+            'due_date': grant.due_date.isoformat(),
+            'funding_amount': grant.funding_amount
+        })
+    return jsonify({"error": "Grant not found"}), 404
 
 @app.route('/api/grants/search', methods=['GET'])
 @jwt_required()
@@ -234,6 +228,29 @@ def calculate_match_score(user, grant):
     
     return score
 
+@app.route('/api/grants/matches', methods=['GET'])
+@jwt_required()
+def get_grant_matches():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    grants = Grant.query.all()
+    matched_grants = []
+    
+    for grant in grants:
+        match_score = calculate_match_score(user, grant)
+        if match_score > 0:
+            matched_grants.append({
+                'id': grant.id,
+                'title': grant.title,
+                'agency': grant.agency,
+                'due_date': grant.due_date.isoformat(),
+                'funding_amount': grant.funding_amount,
+                'match_score': match_score
+            })
+    
+    matched_grants.sort(key=lambda x: x['match_score'], reverse=True)
+    return jsonify(matched_grants)
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True)

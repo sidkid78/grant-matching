@@ -1,7 +1,11 @@
 'use client'
 
-import React from 'react'
-import Button from './Button'
+import { FC } from 'react'
+import { Button } from './Button'
+import { Card } from './Card'
+import { CardHeader } from './ui/cardHeader'
+import { CardTitle } from './ui/cardTitle'
+import { Label } from './ui/label'
 
 interface GrantCardProps {
   title: string
@@ -11,30 +15,36 @@ interface GrantCardProps {
   matchScore: number
 }
 
-export default function GrantCard({ title, agency, dueDate, fundingAmount, matchScore }: GrantCardProps) {
+const GrantCard: FC<GrantCardProps> = ({ title, agency, dueDate, fundingAmount, matchScore }) => {
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4">
-      <div className="px-4 py-5 sm:px-6">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">{title}</h3>
+    <Card className="mb-4">
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
         <p className="mt-1 max-w-2xl text-sm text-gray-500">{agency}</p>
-      </div>
+      </CardHeader>
       <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
         <dl className="sm:divide-y sm:divide-gray-200">
           <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Due Date</dt>
+            <dt>
+              <Label htmlFor="dueDate">Due Date</Label>
+            </dt>
             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{dueDate}</dd>
           </div>
           <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Funding Amount</dt>
+            <dt>
+              <Label htmlFor="fundingAmount">Funding Amount</Label>
+            </dt>
             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{fundingAmount}</dd>
           </div>
           <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Match Score</dt>
+            <dt>
+              <Label htmlFor="matchScore">Match Score</Label>
+            </dt>
             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
               <div className="flex items-center">
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
-                    className={`bg-blue-600 h-2.5 rounded-full`}
+                    className="bg-blue-600 h-2.5 rounded-full"
                     style={{ width: `${matchScore}%` }} // This line remains as Tailwind doesn't support dynamic widths
                   ></div>
                 </div>
@@ -47,6 +57,8 @@ export default function GrantCard({ title, agency, dueDate, fundingAmount, match
       <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
         <Button variant="primary" size="small">View Details</Button>
       </div>
-    </div>
+    </Card>
   )
 }
+
+export { GrantCard }

@@ -1,6 +1,7 @@
 'use client'
 
 import { FC, ButtonHTMLAttributes } from 'react'
+import classNames from 'classnames'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary'
@@ -18,11 +19,12 @@ const sizeStyles = {
   large: 'px-4 py-2 text-base'
 };
 
-export const Button: FC<ButtonProps> = ({ children, variant = 'primary', size = 'medium', className = '', ...props }) => (
-  <button
-    className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
-    {...props}
-  >
-    {children}
-  </button>
-);
+export const Button: FC<ButtonProps> = ({ children, variant = 'primary', size = 'medium', className = '', ...props }) => {
+  const buttonClass = classNames(baseStyles, variantStyles[variant], sizeStyles[size], className);
+
+  return (
+    <button className={buttonClass} {...props}>
+      {children}
+    </button>
+  );
+};

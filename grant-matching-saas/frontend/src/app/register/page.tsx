@@ -4,8 +4,11 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
+import Input from '../../components/ui/Input'
+import Card from '../../components/ui/card'
+import CardContent from '../../components/ui/card'
+import CardHeader from '../../components/ui/card'
+import CardTitle from '../../components/ui/card'
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -46,7 +49,7 @@ export default function Register() {
         const data = await response.json()
         setError(data.msg)
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred during registration')
     }
   }

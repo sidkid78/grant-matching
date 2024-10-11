@@ -21,7 +21,10 @@ interface SelectTriggerProps {
 
 export const SelectTrigger: FC<SelectTriggerProps> = ({ children, className }) => {
   return (
-    <button className={`border border-gray-300 rounded-md p-2 w-full ${className}`}>
+    <button
+      type="button"
+      className={`border border-gray-300 rounded-md p-2 w-full ${className}`}
+    >   
       {children}
     </button>
   );

@@ -1,8 +1,6 @@
-'use client'
-
 import React, { useState } from 'react'
 import Input from './ui/input'
-import Button from './Button' // Changed to default import
+import { Button } from './ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { Label } from './ui/label'
 
@@ -19,7 +17,7 @@ interface SearchParams {
 
 interface GrantSearchProps {
   onSearch: (params: SearchParams) => void;
-}   
+}
 
 export function GrantSearch({ onSearch }: GrantSearchProps) {
   const [query, setQuery] = useState('')
@@ -45,68 +43,43 @@ export function GrantSearch({ onSearch }: GrantSearchProps) {
     })
   }
 
+  const renderInput = (
+    id: string, 
+    type: string, 
+    value: string, 
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void, 
+    placeholder: string = '' // Default value added here
+  ) => (
+    <div>
+      <Label htmlFor={id}>{id.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</Label>
+      <Input
+        id={id}
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+      />
+    </div>
+  )
+
   return (
     <form onSubmit={handleSearch} className="space-y-4">
-      <div>
-        <Label htmlFor="query">Search</Label>
-        <Input
-          id="query"
-          type="text"
-          value={query}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
-          placeholder="Search grants..."
-        />
-      </div>
-      <div>
-        <Label htmlFor="agency">Agency</Label>
-        <Input
-          id="agency"
-          type="text"
-          value={agency}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAgency(e.target.value)}
-          placeholder="Filter by agency..."
-        />
-      </div>
+      {renderInput('query', 'text', query, (e) => setQuery(e.target.value), 'Search grants...')}
+      {renderInput('agency', 'text', agency, (e) => setAgency(e.target.value), 'Filter by agency...')}
       <div className="flex space-x-4">
         <div className="flex-1">
-          <Label htmlFor="minAmount">Min Amount</Label>
-          <Input
-            id="minAmount"
-            type="number"
-            value={minAmount}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMinAmount(e.target.value)}
-            placeholder="Min amount..."
-          />
+          {renderInput('minAmount', 'number', minAmount, (e) => setMinAmount(e.target.value), 'Min amount...')}
         </div>
         <div className="flex-1">
-          <Label htmlFor="maxAmount">Max Amount</Label>
-          <Input
-            id="maxAmount"
-            type="number"
-            value={maxAmount}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxAmount(e.target.value)}
-            placeholder="Max amount..."
-          />
+          {renderInput('maxAmount', 'number', maxAmount, (e) => setMaxAmount(e.target.value), 'Max amount...')}
         </div>
       </div>
       <div className="flex space-x-4">
         <div className="flex-1">
-          <Label htmlFor="startDate">Start Date</Label>
-          <Input
-            id="startDate"
-            type="date"
-            value={startDate}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartDate(e.target.value)}
-          />
+          {renderInput('startDate', 'date', startDate, (e) => setStartDate(e.target.value))}
         </div>
         <div className="flex-1">
-          <Label htmlFor="endDate">End Date</Label>
-          <Input
-            id="endDate"
-            type="date"
-            value={endDate}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndDate(e.target.value)}
-          />
+          {renderInput('endDate', 'date', endDate, (e) => setEndDate(e.target.value))}
         </div>
       </div>
       <div className="flex space-x-4">

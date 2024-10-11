@@ -3,12 +3,12 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Button from '../../components/Button'
-import Input from '../../components/ui/input'
+import { Button } from '../../components/ui/button'
+import Input from '../../components/ui/Input'
 import Card from '../../components/ui/card'
-import CardContent from '../../components/ui/cardContent'
-import CardHeader from '../../components/ui/cardHeader'
-import CardTitle from '../../components/ui/cardTitle'
+import CardContent from '../../components/ui/card'
+import CardHeader from '../../components/ui/card'
+import CardTitle from '../../components/ui/card'
 import { useAuth } from '../../context/AuthContext'
 
 export default function Login() {
@@ -47,6 +47,7 @@ export default function Login() {
                 value={email}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 required
+                placeholder="Enter your email" // Added placeholder
               />
             </div>
             <div>
@@ -59,6 +60,7 @@ export default function Login() {
                 value={password}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 required
+                placeholder="Enter your password" // Added placeholder
               />
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}

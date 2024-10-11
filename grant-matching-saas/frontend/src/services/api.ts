@@ -30,7 +30,15 @@ export async function fetchUserProfile() {
   return fetchWithAuth(`${API_BASE_URL}/profile`);
 }
 
-export async function updateUserProfile(data: any) {
+// Define an interface for the user profile data
+interface UserProfileData {
+  // Add specific fields expected in the user profile
+  name: string;
+  email: string;
+  // Add other fields as necessary
+}
+
+export async function updateUserProfile(data: UserProfileData) {
   return fetchWithAuth(`${API_BASE_URL}/profile`, {
     method: 'PUT',
     body: JSON.stringify(data),

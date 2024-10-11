@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useState, useContext, useEffect } from 'react'
+import React, { createContext, useState, useContext, useEffect, FC, PropsWithChildren } from 'react'
 import { fetchGrants } from '../services/api'
 import { useAuth } from './AuthContext'
 
@@ -22,7 +22,7 @@ interface GrantContextType {
 
 const GrantContext = createContext<GrantContextType | undefined>(undefined)
 
-export const GrantProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const GrantProvider: FC<PropsWithChildren> = ({ children }) => {
   const [grants, setGrants] = useState<Grant[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -35,8 +35,12 @@ export const GrantProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const data = await fetchGrants()
       setGrants(data)
       setError(null)
-    } catch (err) {
-      setError(err.message)
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('An unknown error occurred')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -53,9 +57,9 @@ export const GrantProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   )
 }
 
-export const useGrants = () => {
+export const useGrants = (): GrantContextType => {
   const context = useContext(GrantContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useGrants must be used within a GrantProvider')
   }
   return context
