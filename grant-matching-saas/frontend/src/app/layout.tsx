@@ -3,6 +3,8 @@ import Link from 'next/link'
 import './globals.css'
 import { AuthProvider } from '../context/AuthContext'
 import { GrantProvider } from '../context/GrantContext'
+import { NotificationBell } from '../components/NotificationBell'
+import { UserNav } from '../components/UserNav'
 
 export const metadata = {
   title: 'Grant Matching SaaS',
@@ -24,7 +26,7 @@ export default function RootLayout({
                 <div className="flex justify-between h-16">
                   <div className="flex">
                     <Link href="/" className="flex-shrink-0 flex items-center">
-                      Grant Matching SaaS
+                      Grant Matcher
                     </Link>
                     <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                       <Link href="/dashboard" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
@@ -38,6 +40,10 @@ export default function RootLayout({
                       </Link>
                     </div>
                   </div>
+                  <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                    <NotificationBell />
+                    <UserNav />
+                  </div>
                 </div>
               </div>
             </nav>
@@ -49,7 +55,7 @@ export default function RootLayout({
             <footer className="bg-white border-t border-gray-200">
               <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <p className="text-center text-sm text-gray-500">
-                  © 2024 Grant Matching SaaS. All rights reserved.
+                  © 2024 Grant Matcher. All rights reserved.
                 </p>
               </div>
             </footer>

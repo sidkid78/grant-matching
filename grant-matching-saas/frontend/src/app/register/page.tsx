@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '../../components/Button'
+import Link from 'next/link'
+import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -45,7 +46,7 @@ export default function Register() {
         const data = await response.json()
         setError(data.msg)
       }
-    } catch {
+    } catch (err) {
       setError('An error occurred during registration')
     }
   }
@@ -137,6 +138,12 @@ export default function Register() {
               Register
             </Button>
           </form>
+          <p className="mt-4 text-center text-sm text-gray-600">
+            Already have an account?{' '}
+            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+              Login here
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>

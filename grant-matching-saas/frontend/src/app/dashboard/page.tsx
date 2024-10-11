@@ -2,8 +2,11 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/Card'
-import { Button } from '../../components/Button'
+import { Card } from '../../components/ui/card'
+import { CardContent } from '../../components/ui/card'
+import { CardHeader } from '../../components/ui/card'
+import { cardTitle } from '../../components/ui/card'
+import { button } from '../../components/ui/button'
 import { useAuth } from '../../context/AuthContext'
 
 interface Grant {

@@ -1,21 +1,29 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import Button from '../../components/Button'
+import Input from '../../components/ui/input'
+import Card from '../../components/ui/card'
+import CardContent from '../../components/ui/cardContent'
+import CardHeader from '../../components/ui/cardHeader'
+import CardTitle from '../../components/ui/cardTitle'
 import { useAuth } from '../../context/AuthContext'
-import { Button } from '../../components/Button'
-import { Input } from '../../components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/Card'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const router = useRouter()
   const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
     try {
       await login(email, password)
+      router.push('/dashboard')
     } catch {
       setError('Invalid email or password')
     }
@@ -58,6 +66,12 @@ export default function Login() {
               Login
             </Button>
           </form>
+          <p className="mt-4 text-center text-sm text-gray-600">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+              Register here
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>

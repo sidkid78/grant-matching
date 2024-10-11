@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import Button from './Button'
 
@@ -31,7 +33,10 @@ export default function GrantCard({ title, agency, dueDate, fundingAmount, match
             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
               <div className="flex items-center">
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${matchScore}%` }}></div>
+                  <div
+                    className={`bg-blue-600 h-2.5 rounded-full`}
+                    style={{ width: `${matchScore}%` }} // This line remains as Tailwind doesn't support dynamic widths
+                  ></div>
                 </div>
                 <span className="ml-2">{matchScore}%</span>
               </div>

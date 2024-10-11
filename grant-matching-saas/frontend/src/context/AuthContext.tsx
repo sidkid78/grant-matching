@@ -1,7 +1,6 @@
 'use client'
 
 import React, { createContext, useState, useContext, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 
 interface AuthContextType {
   isAuthenticated: boolean
@@ -13,13 +12,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const router = useRouter()
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    if (token) {
-      setIsAuthenticated(true)
-    }
+    setIsAuthenticated(!!token)
   }, [])
 
   const login = async (email: string, password: string) => {
@@ -32,14 +28,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ email, password }),
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        localStorage.setItem('token', data.access_token)
-        setIsAuthenticated(true)
-        router.push('/dashboard')
-      } else {
+      if (!response.ok) {
         throw new Error('Login failed')
       }
+
+      const data = await response.json()
+      localStorage.setItem('token', data.access_token)
+      setIsAuthenticated(true)
     } catch (error) {
       console.error('Login error:', error)
       throw error
@@ -49,7 +44,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     localStorage.removeItem('token')
     setIsAuthenticated(false)
-    router.push('/')
   }
 
   return (
