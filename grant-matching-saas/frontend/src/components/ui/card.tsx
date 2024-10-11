@@ -11,3 +11,15 @@ export const Card: FC<CardProps> = ({ children, className = '', ...props }) => {
     </div>
   );
 };
+
+interface CardContentProps extends HTMLAttributes<HTMLDivElement> {
+  className?: string;
+}
+
+export const CardContent: FC<CardContentProps> = ({ children, className = '', ...props }) => {
+  return (
+    <div className={`p-4 ${className}`} {...props}>
+      {children}
+    </div>
+  );
+};

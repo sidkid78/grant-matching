@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import './globals.css'
+import '../styles/globals.css'
 import { AuthProvider } from '../context/AuthContext'
 import { GrantProvider } from '../context/GrantContext'
 import { NotificationBell } from '../components/NotificationBell'
@@ -18,47 +18,76 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gray-100">
+      <body className="min-h-screen bg-background font-sans antialiased">
         <AuthProvider>
           <GrantProvider>
-            <nav className="bg-white shadow-sm">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-16">
-                  <div className="flex">
-                    <Link href="/" className="flex-shrink-0 flex items-center">
-                      Grant Matcher
+            <div className="relative flex min-h-screen flex-col">
+              <header className="sticky top-0 z-40 border-b bg-background">
+                <div className="container flex h-16 items-center justify-between py-4">
+                  <div className="flex gap-6 md:gap-10">
+                    <Link href="/" className="flex items-center space-x-2">
+                      <span className="inline-block font-bold">Grant Matcher</span>
                     </Link>
-                    <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                      <Link href="/dashboard" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                    <nav className="flex gap-6">
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center text-sm font-medium text-muted-foreground"
+                      >
                         Dashboard
                       </Link>
-                      <Link href="/grants" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                      <Link
+                        href="/grants"
+                        className="flex items-center text-sm font-medium text-muted-foreground"
+                      >
                         Grants
                       </Link>
-                      <Link href="/profile" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                      <Link
+                        href="/profile"
+                        className="flex items-center text-sm font-medium text-muted-foreground"
+                      >
                         Profile
                       </Link>
-                    </div>
+                    </nav>
                   </div>
-                  <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                  <div className="flex items-center gap-4">
                     <NotificationBell />
                     <UserNav />
                   </div>
                 </div>
-              </div>
-            </nav>
-
-            <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-              {children}
-            </main>
-
-            <footer className="bg-white border-t border-gray-200">
-              <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <p className="text-center text-sm text-gray-500">
-                  © 2024 Grant Matcher. All rights reserved.
-                </p>
-              </div>
-            </footer>
+              </header>
+              <main className="flex-1">
+                <div className="container py-6">
+                  {children}
+                </div>
+              </main>
+              <footer className="border-t bg-background">
+                <div className="container flex flex-col items-center justify-between gap-4 py-10 md:h-24 md:flex-row md:py-0">
+                  <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+                    <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
+                      Built by{" "}
+                      <a
+                        href="#"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-medium underline underline-offset-4"
+                      >
+                        Your Company
+                      </a>
+                      . The source code is available on{" "}
+                      <a
+                        href="#"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-medium underline underline-offset-4"
+                      >
+                        GitHub
+                      </a>
+                      .
+                    </p>
+                  </div>
+                </div>
+              </footer>
+            </div>
           </GrantProvider>
         </AuthProvider>
       </body>

@@ -1,45 +1,77 @@
 'use client'
 
-import { FC, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Bell } from 'lucide-react';
+import { Button } from './ui/button';
+import { Card, CardContent } from './ui/card';
+import { getNotifications, markNotificationAsRead, Notification } from '../services/notificationService';
 
-interface Notification {
-  id: number;
-  message: string;
-  read: boolean;
-}
-
-const fetchNotifications = async (): Promise<Notification[]> => {
-  const response = await fetch('/api/notifications');
-  return response.json();
-};
-
-const NotificationBell: FC = () => {
+export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [hasUnread, setHasUnread] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const getNotifications = async () => {
-      const data = await fetchNotifications();
-      setNotifications(data);
-      setHasUnread(data.some(notification => !notification.read));
-    };
-
-    getNotifications();
+    fetchNotifications();
   }, []);
 
-  const handleBellClick = () => {
-    setNotifications(notifications.map(notification => ({ ...notification, read: true })));
-    setHasUnread(false);
+  const fetchNotifications = async () => {
+    const fetchedNotifications = await getNotifications();
+    setNotifications(fetchedNotifications);
+  };
+
+  const handleMarkAsRead = async (notificationId: number) => {
+    await markNotificationAsRead(notificationId);
+    setNotifications(notifications.filter(n => n.id !== notificationId));
   };
 
   return (
-    <button type="button" onClick={handleBellClick} className="relative">
-      <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-      </svg>
-      {hasUnread && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-400"></span>}
-    </button>
+    <div className="relative">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setIsOpen(!isOpen)}
+        className="relative"
+      >
+        <Bell className="h-5 w-5" />
+        {notifications.length > 0 && (
+          <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+            {notifications.length}
+          </span>
+        )}
+      </Button>
+      {isOpen && (
+        <Card className="absolute right-0 mt-2 w-80 z-50">
+          <CardContent className="py-2">
+            {notifications.length > 0 ? (
+              <ul className="divide-y divide-border">
+                {notifications.map((notification) => (
+                  <li key={notification.id} className="py-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">
+                          {notification.message}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(notification.created_at).toLocaleString()}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleMarkAsRead(notification.id)}
+                      >
+                        Mark as read
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">No new notifications</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
-};
-
-export { NotificationBell };
+}

@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Button } from './Button'
+import { Button } from './ui/button'
 import { useAuth } from '../context/AuthContext'
 
 export function UserNav() {
@@ -18,10 +18,10 @@ export function UserNav() {
   if (!isAuthenticated) {
     return (
       <div className="flex items-center space-x-4">
-        <Button variant="secondary">
+        <Button asChild variant="ghost">
           <Link href="/login">Login</Link>
         </Button>
-        <Button variant="secondary">
+        <Button asChild>
           <Link href="/register">Register</Link>
         </Button>
       </div>
@@ -29,7 +29,7 @@ export function UserNav() {
   }
 
   return (
-    <Button onClick={handleLogout} variant="secondary">
+    <Button onClick={handleLogout} variant="ghost">
       Logout
     </Button>
   )
