@@ -19,7 +19,24 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
 }
 
 export async function fetchGrants() {
-  return fetchWithAuth(`${API_BASE_URL}/grants`);
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/grants`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to fetch grants');
+  }
+
+  return response.json();
 }
 
 export async function fetchGrant(id: string) {

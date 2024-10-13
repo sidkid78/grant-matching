@@ -1,30 +1,9 @@
-import { ChangeEvent } from 'react';
+import { InputHTMLAttributes, forwardRef } from 'react'
 
-interface InputProps {
-    id: string; // Add this line
-    type: string;
-    value: string;
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-    placeholder?: string;
-}
+const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>((props, ref) => {
+  return <input className="w-full px-3 py-2 border rounded-md" ref={ref} {...props} />
+})
 
-interface InputProps {
-  id: string;
-  type: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-}
+Input.displayName = 'Input'
 
-export function Input({ id, type, value, onChange, placeholder }: InputProps) {
-    return (
-        <input
-            id={id}
-            type={type}
-            value={value}
-            onChange={onChange}
-            placeholder={placeholder}
-            className="input-class" // Example Tailwind class
-        />
-    );
-}
+export { Input }

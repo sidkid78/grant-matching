@@ -7,7 +7,7 @@ import { Button } from './ui/button'
 import { useAuth } from '../context/AuthContext'
 
 export function UserNav() {
-  const { isAuthenticated, logout } = useAuth()
+  const { isAuthenticated, logout, user } = useAuth()
   const router = useRouter()
 
   const handleLogout = () => {
@@ -29,8 +29,11 @@ export function UserNav() {
   }
 
   return (
-    <Button onClick={handleLogout} variant="ghost">
-      Logout
-    </Button>
+    <div className="flex items-center space-x-4">
+      <span className="text-sm text-muted-foreground">{user?.email}</span>
+      <Button onClick={handleLogout} variant="ghost">
+        Logout
+      </Button>
+    </div>
   )
 }

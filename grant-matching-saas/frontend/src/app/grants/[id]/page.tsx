@@ -1,10 +1,8 @@
-'use client'
-
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { fetchGrant } from '../../../services/api'
-import Card from '../../../components/ui/card'
-import CardContent from '../../../components/ui/cardContent'
+import { Card } from '../../../components/ui/card'
+import { CardContent } from '../../../components/ui/cardContent'
 import { Button } from '../../../components/Button'
 
 interface Grant {

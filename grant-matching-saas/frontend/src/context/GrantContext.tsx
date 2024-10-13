@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useState, useContext, useEffect, FC, PropsWithChildren } from 'react'
+import React, { createContext, useState, useContext, useEffect, useCallback, FC, PropsWithChildren } from 'react'
 import { fetchGrants } from '../services/api'
 import { useAuth } from './AuthContext'
 
@@ -28,7 +28,7 @@ export const GrantProvider: FC<PropsWithChildren> = ({ children }) => {
   const [error, setError] = useState<string | null>(null)
   const { isAuthenticated } = useAuth()
 
-  const refreshGrants = async () => {
+  const refreshGrants = useCallback(async () => {
     if (!isAuthenticated) return
     try {
       setIsLoading(true)
@@ -44,11 +44,11 @@ export const GrantProvider: FC<PropsWithChildren> = ({ children }) => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [isAuthenticated])
 
   useEffect(() => {
     refreshGrants()
-  }, [isAuthenticated])
+  }, [refreshGrants])
 
   return (
     <GrantContext.Provider value={{ grants, isLoading, error, refreshGrants }}>

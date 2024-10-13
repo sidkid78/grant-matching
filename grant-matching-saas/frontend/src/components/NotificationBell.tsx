@@ -5,7 +5,7 @@ import { Bell } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { getNotifications, markNotificationAsRead, Notification } from '../services/notificationService';
-
+  
 export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);

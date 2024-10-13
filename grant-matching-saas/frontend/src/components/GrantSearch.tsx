@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Input from './ui/input'
+import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { Label } from './ui/label'
@@ -43,24 +43,26 @@ export function GrantSearch({ onSearch }: GrantSearchProps) {
     })
   }
 
-  const renderInput = (
+  function renderInput(
     id: string, 
     type: string, 
     value: string, 
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void, 
-    placeholder: string = '' // Default value added here
-  ) => (
-    <div>
-      <Label htmlFor={id}>{id.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</Label>
-      <Input
-        id={id}
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-      />
-    </div>
-  )
+    placeholder: string = ''
+  ) {
+    return (
+      <div>
+        <Label htmlFor={id}>{id.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</Label>
+        <Input
+          id={id}
+          type={type}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+        />
+      </div>
+    )
+  }
 
   return (
     <form onSubmit={handleSearch} className="space-y-4">

@@ -4,11 +4,8 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '../../components/ui/button'
-import Input from '../../components/ui/Input'
-import Card from '../../components/ui/card'
-import CardContent from '../../components/ui/card'
-import CardHeader from '../../components/ui/card'
-import CardTitle from '../../components/ui/card'
+import { Input } from '../../components/ui/input'
+import { Card, CardContent } from '../../components/ui/card'
 import { useAuth } from '../../context/AuthContext'
 
 export default function Login() {
@@ -24,53 +21,49 @@ export default function Login() {
     try {
       await login(email, password)
       router.push('/dashboard')
-    } catch {
-      setError('Invalid email or password')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred')
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
+          <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground">
                 Email
               </label>
               <Input
                 type="email"
                 id="email"
                 value={email}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="Enter your email" // Added placeholder
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground">
                 Password
               </label>
               <Input
                 type="password"
                 id="password"
                 value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="Enter your password" // Added placeholder
               />
             </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-destructive text-sm">{error}</p>}
             <Button type="submit" className="w-full">
               Login
             </Button>
           </form>
-          <p className="mt-4 text-center text-sm text-gray-600">
+          <p className="mt-4 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link href="/register" className="font-medium text-primary hover:underline">
               Register here
             </Link>
           </p>

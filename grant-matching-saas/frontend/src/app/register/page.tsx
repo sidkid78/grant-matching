@@ -4,11 +4,8 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '../../components/ui/button'
-import Input from '../../components/ui/Input'
-import Card from '../../components/ui/card'
-import CardContent from '../../components/ui/card'
-import CardHeader from '../../components/ui/card'
-import CardTitle from '../../components/ui/card'
+import { Input } from '../../components/ui/input'
+import { Card, CardContent } from '../../components/ui/card'
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -49,18 +46,18 @@ export default function Register() {
         const data = await response.json()
         setError(data.msg)
       }
-    } catch {
-      setError('An error occurred during registration')
+    } catch (err) {
+      setError(`An error occurred during registration: ${err instanceof Error ? err.message : String(err)}`)
     }
   }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Register</CardTitle>
-        </CardHeader>
         <CardContent>
+          <div className="p-4">
+            <h2 className="text-2xl font-bold text-center">Register</h2>
+          </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
